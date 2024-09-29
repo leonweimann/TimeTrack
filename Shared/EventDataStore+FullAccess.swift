@@ -42,21 +42,21 @@ extension EventDataStore {
         return eventStore.events(matching: predicate)
     }
     
-    private func removeEvent(_ event: EKEvent) throws {
-        try eventStore.remove(event, span: .thisEvent, commit: false)
+    func removeEvent(_ event: EKEvent) throws {
+        try eventStore.remove(event, span: .thisEvent)
     }
     
-    func removeEvents(_ events: [EKEvent]) throws {
-        do {
-            try events.forEach { event in
-                try removeEvent(event)
-            }
-            try eventStore.commit()
-        } catch {
-            eventStore.reset()
-            throw error
-        }
-    }
+//    func removeEvents(_ events: [EKEvent]) throws {
+//        do {
+//            try events.forEach { event in
+//                try removeEvent(event)
+//            }
+//            try eventStore.commit()
+//        } catch {
+//            eventStore.reset()
+//            throw error
+//        }
+//    }
     
     func addEvent(_ event: EKEvent) throws {
         try eventStore.save(event, span: .thisEvent)
