@@ -35,7 +35,15 @@ extension Session {
 
 extension Session: Equatable {
     static func ==(lhs: Session, rhs: Session) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id &&
+        lhs.type == rhs.type &&
+        lhs.name == rhs.name &&
+        lhs.startDate == rhs.startDate &&
+        lhs.endDate == rhs.endDate
+    }
+    
+    func isIdentical(to other: Session) -> Bool {
+        id == other.id
     }
 }
 
