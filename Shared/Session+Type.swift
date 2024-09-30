@@ -12,4 +12,11 @@ enum SessionType: Int, Hashable, CaseIterable, Identifiable {
     
     case personal = 0
     case work = 1
+    
+    var title: String {
+        NSLocalizedString(
+            String(describing: self).capitalized,
+            comment: "A session type"
+        )
+    }
 }
