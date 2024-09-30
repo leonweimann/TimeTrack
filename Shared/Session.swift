@@ -13,16 +13,16 @@ struct Session: Hashable, Identifiable {
     var type: SessionType
     var name: String
     
-    var startAt: Int
-    var endAt: Int?
+    var startDate: Date
+    var endDate: Date?
     
-    var isCurrent: Bool { endAt != nil }
+    var isCurrent: Bool { endDate != nil }
     
-    init(id: String = UUID().uuidString, type: SessionType, name: String, startAt: Int) {
+    init(id: String = UUID().uuidString, type: SessionType, name: String, startDate: Date) {
         self.id = id
         self.type = type
         self.name = name
-        self.startAt = startAt
+        self.startDate = startDate
     }
 }
 
@@ -39,7 +39,7 @@ extension Session: Equatable {
 }
 
 extension Session {
-    static var sessionMock: Session {
-        Session(type: .personal, name: "Ironing", startAt: 43_200)
+    static var sessionStartMock: Session {
+        Session(type: .personal, name: "Ironing", startDate: Date.now)
     }
 }
