@@ -29,7 +29,7 @@ struct Session: Hashable, Identifiable {
 
 extension Session {
     var title: String {
-        (isCurrent ? "Current" : "Session") + name
+        (isCurrent ? "Current" : "Session") + " " + name
     }
 }
 
