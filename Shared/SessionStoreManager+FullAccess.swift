@@ -21,7 +21,7 @@ extension SessionStoreManager {
                 do {
                     return try Session(event: event)
                 } catch {
-                    if case SessionError.creationFailure(let failure) = error {
+                    if case SessionError.creationFailure(_) = error {
                         throw error
                     }
                     
