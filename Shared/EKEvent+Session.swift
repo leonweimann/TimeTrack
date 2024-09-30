@@ -12,8 +12,8 @@ extension EKEvent {
         self.init(eventStore: eventStore)
         self.title = session.title
         self.calendar = calendar ?? eventStore.defaultCalendarForNewEvents
-        self.startDate = session.startAtDate
-        self.endDate = session.endAtDate
+        self.startDate = session.startDate
+        self.endDate = session.endDate ?? session.startDate
         self.notes = String(describing: session.type)
         
         self.url = URL(string: "session-\(session.id)")

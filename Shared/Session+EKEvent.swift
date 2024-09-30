@@ -1,22 +1,11 @@
 //
-//  Session+Date.swift
+//  Session+EKEvent.swift
 //  TimeTrack
 //
-//  Created by Leon Weimann on 29.09.24.
+//  Created by Leon Weimann on 30.09.24.
 //
 
 import EventKit
-
-extension Session {
-    var startAtDate: Date {
-        TimeInterval(startAt).toTodayDate
-    }
-    
-    var endAtDate: Date {
-        guard let endAt else { return startAtDate }
-        return TimeInterval(endAt).toTodayDate
-    }
-}
 
 extension Session {
     func event(store: EKEventStore, calendar: EKCalendar? = nil) throws -> EKEvent {
