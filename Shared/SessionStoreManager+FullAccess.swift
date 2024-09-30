@@ -39,5 +39,6 @@ extension SessionStoreManager {
     
     func removeSession(_ session: Session) async throws {
         try await datastore.removeEvent(session.event(store: datastore.eventStore))
+        sessions.removeAll { session.isIdentical(to: $0) }
     }
 }
