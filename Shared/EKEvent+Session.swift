@@ -16,6 +16,8 @@ extension EKEvent {
         self.endDate = session.endAtDate
         self.notes = String(describing: session.type)
         
+        self.url = URL(string: "session-\(session.id)")
+        
         self.timeZone = TimeZone.current
     }
 }
