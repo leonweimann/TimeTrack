@@ -19,7 +19,7 @@ extension Session {
 }
 
 extension Session {
-    func eventWithDate(_ date: Date, store: EKEventStore, calendar: EKCalendar? = nil) throws -> EKEvent {
+    func event(store: EKEventStore, calendar: EKCalendar? = nil) throws -> EKEvent {
         guard isCurrent else { throw SessionError.notFinished }
         let newEvent = EKEvent(self, eventStore: store, calendar: calendar)
         return newEvent
