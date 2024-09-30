@@ -43,4 +43,8 @@ extension Session {
     static var sessionStartMock: Session {
         Session(type: .personal, name: "Ironing", startDate: Date.now)
     }
+    
+    static var sessionStartEndMock: Session {
+        Session(type: .work, name: "Making Coffee", startDate: Date.now.yesterday, endDate: Date.now)
+    }
 }
