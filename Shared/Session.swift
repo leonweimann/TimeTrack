@@ -16,7 +16,7 @@ struct Session: Hashable, Identifiable {
     var startDate: Date
     var endDate: Date?
     
-    var isCurrent: Bool { endDate != nil }
+    var isCurrent: Bool { endDate == nil }
     
     init(id: String = UUID().uuidString, type: SessionType, name: String, startDate: Date, endDate: Date? = nil) {
         self.id = id
