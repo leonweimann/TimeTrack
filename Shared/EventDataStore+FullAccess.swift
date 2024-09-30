@@ -5,7 +5,7 @@
 //  Created by Leon Weimann on 29.09.24.
 //
 
-import EventKit
+@preconcurrency import EventKit
 
 extension EventDataStore {
     var isFullAccessAuthorized: Bool {
