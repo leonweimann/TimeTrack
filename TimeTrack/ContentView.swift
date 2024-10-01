@@ -14,6 +14,20 @@ struct ContentView: View {
     var body: some View {
         Home()
             .environment(sessionManager)
+            .task {
+                await visualizingPossibleError {
+                    try await sessionManager.setupSessionStore()
+                }
+            }
+    }
+    
+    private func visualizingPossibleError(completion: @escaping () async throws -> ()) async {
+        do {
+            try await completion()
+        } catch {
+            print(error.localizedDescription)
+            // TODO: Visualize error
+        }
     }
 }
 
