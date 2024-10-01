@@ -33,8 +33,8 @@ extension SessionStoreManager {
     }
     
     func addSession(_ session: Session) async throws {
+        guard !session.isCurrent else { throw SessionError.notFinished }
         try await datastore.addEvent(session.event(store: datastore.eventStore))
-        sessions.append(session)
     }
     
     func removeSession(_ session: Session) async throws {
