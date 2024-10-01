@@ -25,7 +25,9 @@ extension SessionStoreManager {
         sessions[index] = session
     }
     
-    func finishSession(_ session: Session) throws {
+    func finishSession(_ sessionID: Session.ID) throws {
+        guard let session = sessions.first(where: { $0.id == sessionID }) else { throw SessionError.notFound }
         guard session.isCurrent else { throw SessionError.alreadyFinished }
+        // TODO: ...
     }
 }
