@@ -19,14 +19,18 @@ struct Home: View {
                 } else {
                     List {
                         Section {
-                            currentsComponent
+                            if sessionManager.currents.isEmpty {
+                                createSessionButton
+                            } else {
+                                currentsComponent
+                            }
                         } header: {
                             currentSessionsHeader
                         }
                         
                         Section {
                             ForEach(sessionManager.sessions) { session in
-                                // Functions: stop, restore, delete, edit, save as template
+                                // Functions: --stop--, restore, delete, --edit--, save as template
                                 Button {
 //                                    current = nil
 //                                    current = session
@@ -55,17 +59,10 @@ struct Home: View {
 extension Home {
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
-        ToolbarItem(placement: .bottomBar) {
+        ToolbarItem(placement: .bottomBar) { // TODO: Is bottomBar really the way to go?
             HStack {
                 createSessionButton
-                
-                Button {
-                    guard !sessionManager.sessions.isEmpty else { return }
-                    sessionManager.sessions.removeLast()
-                } label: {
-                    Image(systemName: "pause")
-                        .frame(maxWidth: .infinity)
-                }
+                stopSessionButton
             }
         }
     }
@@ -81,12 +78,20 @@ extension Home {
     }
     
     private var createSessionButton: some View {
-        Button {
-            sessionManager.sessions.append(
-                Bool.random() ? .sessionStartMock : .sessionStartEndMock
-            )
-        } label: {
+        Button(action: createSession) {
             Label("Start a new Session", systemImage: "plus")
+        }
+    }
+    
+    private var stopSessionButton: some View {
+        Button(role: .destructive, action: stopSession) {
+            Label("Stop Session", systemImage: "stop")
+        }
+    }
+    
+    private var editSessionButton: some View {
+        Button(action: editSession) {
+            Label("Edit Session", systemImage: "pencil")
         }
     }
     
@@ -94,17 +99,11 @@ extension Home {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 0) {
                 ForEach(sessionManager.currents) { current in
-                    Button {
-                        selection = current.id
-                    } label: {
-                        SessionDetailView(session: current)
-                    }
-                    .foregroundStyle(Color.primary)
-                    .containerRelativeFrame(.horizontal)
-                    .scrollTransition(.interactive, axis: .horizontal) { content, phase in
-                        content
-                            .scaleEffect(phase.isIdentity ? 1 : 0.8, anchor: .bottom)
-                    }
+                    CurrentSessionDetailCell(session: current)
+                        .scrollTransition(.interactive, axis: .horizontal) { content, phase in
+                            content
+                                .scaleEffect(phase.isIdentity ? 1 : 0.8, anchor: .bottom)
+                        }
                 }
             }
             .scrollTargetLayout()
@@ -112,7 +111,22 @@ extension Home {
         .scrollTargetBehavior(.paging)
         .scrollPosition(id: $selection)
         .scrollIndicators(.hidden)
+        .scrollDisabled(sessionManager.currents.count < 2)
         .animation(.smooth, value: selection)
+    }
+    
+    private func CurrentSessionDetailCell(session: Session) -> some View {
+        Menu {
+            stopSessionButton
+            
+            Divider()
+            
+            editSessionButton
+        } label: {
+            SessionDetailView(session: session)
+        } 
+        .foregroundStyle(Color.primary)
+        .containerRelativeFrame(.horizontal)
     }
     
     private var currentSessionsHeader: some View {
@@ -139,6 +153,25 @@ extension Home {
                 .contentTransition(.numericText())
                 .animation(.smooth, value: sessionManager.sessions.count)
         }
+    }
+}
+
+// MARK: -
+
+extension Home {
+    private func createSession() { // TODO: ...
+        sessionManager.sessions.append(
+            Bool.random() ? .sessionStartMock : .sessionStartEndMock
+        )
+    }
+    
+    private func stopSession() {
+        guard let selection else { return }
+        try? sessionManager.finishSession(selection) // TODO: error handling
+    }
+    
+    private func editSession() { // TODO: ...
+
     }
 }
 
