@@ -21,13 +21,18 @@ extension SessionStoreManager {
     
     func updateSession(_ session: Session) throws {
         guard session.isCurrent else { throw SessionError.alreadyFinished }
-        guard let index = sessions.firstIndex(of: session) else { throw SessionError.notFound }
-        sessions[index] = session
+        try mutateSession(for: session.id) { savedSession in
+            savedSession = session
+        }
     }
     
     func finishSession(_ sessionID: Session.ID) throws {
-        guard let session = sessions.first(where: { $0.id == sessionID }) else { throw SessionError.notFound }
-        guard session.isCurrent else { throw SessionError.alreadyFinished }
-        // TODO: ...
+        try mutateSession(for: sessionID) { session in
+            guard session.isCurrent else { throw SessionError.alreadyFinished }
+            
+            // TODO: ...
+            // ?
+            try session.endNow()
+        }
     }
 }
