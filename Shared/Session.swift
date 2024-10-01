@@ -57,7 +57,7 @@ extension Session: Equatable {
 
 extension Session {
     static func template() -> Session {
-        Session(type: .personal, name: "Your Session's Name", startDate: Date.now)
+        Session(type: .personal, name: "", startDate: Date.now)
     }
     
     static var sessionStartMock: Session {
