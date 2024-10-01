@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct SessionFormView: View {
-    @Binding var session: Session
-    var onCreate: (Session) -> Void
+    init(_ title: String = "Create new session", session: Binding<Session>, onCreate: @escaping (Session) -> ()) {
+        self.title = title
+        self._session = session
+        self.onCreate = onCreate
+    }
+    
+    private let title: String
+    @Binding private var session: Session
+    private let onCreate: (Session) -> ()
     
     @Environment(\.dismiss) private var dismiss
     
@@ -31,7 +38,7 @@ struct SessionFormView: View {
                 createButton
             }
         }
-        .navigationTitle("Create new session")
+        .navigationTitle(title)
         .toolbar { toolbar }
     }
 }
@@ -59,7 +66,7 @@ extension SessionFormView {
     
     private var createButton: some View {
         Button(action: create) {
-            Label("Create new session", systemImage: "calendar.badge.plus")
+            Label(title, systemImage: "calendar.badge.plus")
         }
     }
 }
