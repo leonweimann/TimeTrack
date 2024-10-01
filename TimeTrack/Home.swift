@@ -11,6 +11,8 @@ struct Home: View {
     @Environment(SessionStoreManager.self) private var sessionManager
     @State private var selection: Session.ID?
     
+    @State private var newSession: Session?
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -18,35 +20,17 @@ struct Home: View {
                     noSessionsView
                 } else {
                     List {
-                        Section {
-                            if sessionManager.currents.isEmpty {
-                                createSessionButton
-                            } else {
-                                currentsComponent
-                            }
-                        } header: {
-                            currentSessionsHeader
-                        }
+                        currentSessions
                         
-                        Section {
-                            ForEach(sessionManager.sessions) { session in
-                                // Functions: --stop--, restore, delete, --edit--, save as template
-                                Button {
-//                                    current = nil
-//                                    current = session
-                                } label: {
-                                    Text(session.title)
-                                }
-                                .tint(.primary)
-                            }
-                        } header: {
-                            historyHeader
-                        }
+                        recentSessions
                     }
                     .toolbar { toolbar }
                 }
             }
             .navigationTitle("TimeTrack")
+            .sheet(item: $newSession, onDismiss: cancelSessionCreation) { _ in
+                newSessionFormSheet
+            }
             .onAppear {
                 selection = sessionManager.currents.first?.id
             }
@@ -74,6 +58,43 @@ extension Home {
             Text("No worries, you can start your first now!")
         } actions: {
             createSessionButton
+        }
+    }
+    
+    private var currentSessions: some View {
+        Section {
+            if sessionManager.currents.isEmpty {
+                createSessionButton
+            } else {
+                currentsComponent
+            }
+        } header: {
+            currentSessionsHeader
+        }
+    }
+    
+    private var recentSessions: some View {
+        Section {
+            // FILTER ...
+            ForEach(sessionManager.sessions) { session in
+                // Functions: --stop--, restore, delete, --edit--, save as template
+                Button {
+                    
+                } label: {
+                    Text(session.title)
+                }
+                .tint(.primary)
+            }
+        } header: {
+            recentsHeader
+        }
+    }
+    
+    @ViewBuilder
+    private var newSessionFormSheet: some View {
+        if newSession != nil {
+            NavigationStack {
+            }
         }
     }
     
@@ -142,10 +163,9 @@ extension Home {
         }
     }
     
-    // FILTER ...
-    private var historyHeader: some View {
+    private var recentsHeader: some View {
         HStack {
-            Text("Last Sessions")
+            Text("Recent Sessions")
             
             Spacer()
             
@@ -159,10 +179,12 @@ extension Home {
 // MARK: -
 
 extension Home {
-    private func createSession() { // TODO: ...
-        sessionManager.sessions.append(
-            Bool.random() ? .sessionStartMock : .sessionStartEndMock
-        )
+    private func createSession() {
+        newSession = .template()
+    }
+    
+    private func cancelSessionCreation() {
+        newSession = nil
     }
     
     private func stopSession() {
