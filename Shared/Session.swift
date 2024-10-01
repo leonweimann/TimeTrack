@@ -56,6 +56,10 @@ extension Session: Equatable {
 }
 
 extension Session {
+    static var template: Session {
+        Session(type: .personal, name: "Your Session's Name", startDate: Date.now)
+    }
+    
     static var sessionStartMock: Session {
         Session(type: .personal, name: "Ironing", startDate: Date.now)
     }
