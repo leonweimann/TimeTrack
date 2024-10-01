@@ -56,7 +56,7 @@ extension Session: Equatable {
 }
 
 extension Session {
-    static var template: Session {
+    static func template() -> Session {
         Session(type: .personal, name: "Your Session's Name", startDate: Date.now)
     }
     
