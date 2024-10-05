@@ -61,6 +61,7 @@ extension Home {
         }
     }
     
+    @ViewBuilder
     private var currentSessions: some View {
         Section {
             if sessionManager.currents.isEmpty {
@@ -71,6 +72,15 @@ extension Home {
         } header: {
             currentSessionsHeader
         }
+        
+        Picker("", selection: $selection) {
+            ForEach(sessionManager.currents) { current in
+                Text(current.title)
+                    .tag(current.id)
+            }
+        }
+        .pickerStyle(.inline)
+        .labelsHidden()
     }
     
     private var recentSessions: some View {
@@ -132,7 +142,6 @@ extension Home {
         .scrollTargetBehavior(.paging)
         .scrollPosition(id: $selection)
         .scrollIndicators(.hidden)
-        .scrollDisabled(sessionManager.currents.count < 2)
         .scrollDisabled(true)
         .listRowInsets(.init())
         .contentMargins(.vertical, 12, for: .scrollContent)
@@ -156,7 +165,7 @@ extension Home {
     
     private var currentSessionsHeader: some View {
         HStack {
-            Text("Current Sessions")
+            Text("Current Sessions (\(sessionManager.currents.count))")
             
             Spacer()
             
