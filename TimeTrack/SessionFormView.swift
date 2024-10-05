@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SessionFormView: View {
-    init(_ title: String = "Create new session", session: Binding<Session>, onCreate: @escaping (Session) -> ()) {
+    init(_ title: String = "Create new session", session: Binding<Session>, onCreate: @escaping (Session) throws -> ()) {
         self.title = title
         self._session = session
         self.onCreate = onCreate
@@ -16,9 +16,14 @@ struct SessionFormView: View {
     
     private let title: String
     @Binding private var session: Session
-    private let onCreate: (Session) -> ()
+    private let onCreate: (Session) throws -> ()
     
+    @Environment(IssueManager.self) private var issueManager
     @Environment(\.dismiss) private var dismiss
+    
+    private var isFormValid: Bool {
+        !session.name.isEmpty
+    }
     
     var body: some View {
         Form {
@@ -66,8 +71,14 @@ extension SessionFormView {
     
     private var createButton: some View {
         Button(action: create) {
-            Label(title, systemImage: "calendar.badge.plus")
+            if isFormValid {
+                Label(title, systemImage: "calendar.badge.plus")
+            } else {
+                Label(title, systemImage: "calendar.badge.plus")
+                    .foregroundStyle(.secondary)
+            }
         }
+        .disabled(!isFormValid)
     }
 }
 
@@ -79,14 +90,19 @@ extension SessionFormView {
     }
     
     private func create() {
-        onCreate(session)
-        dismiss()
+        issueManager.withError {
+            try onCreate(session)
+            dismiss()
+        }
     }
 }
 
 #Preview {
+    @Previewable @State var issueManager = IssueManager()
     @Previewable @State var session = Session.template()
+    
     NavigationStack {
         SessionFormView(session: $session) { _ in }
     }
+    .attachIssueManager(issueManager)
 }

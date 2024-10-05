@@ -8,26 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var issueManager = IssueManager()
     @State private var sessionManager = SessionStoreManager()
 
     // setupSessionStore, app splash screen, app welcome, etc.?
     var body: some View {
         Home()
             .environment(sessionManager)
+            .attachIssueManager(issueManager)
             .task {
-                await visualizingPossibleError {
+                await issueManager.withError {
                     try await sessionManager.setupSessionStore()
                 }
             }
-    }
-    
-    private func visualizingPossibleError(completion: @escaping () async throws -> ()) async {
-        do {
-            try await completion()
-        } catch {
-            print(error.localizedDescription)
-            // TODO: Visualize error
-        }
     }
 }
 

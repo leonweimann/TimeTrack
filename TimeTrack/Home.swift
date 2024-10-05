@@ -43,7 +43,7 @@ struct Home: View {
 extension Home {
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
-        ToolbarItem(placement: .bottomBar) { // TODO: Is bottomBar really the way to go?
+        ToolbarItem(placement: .bottomBar) { // TODO: Is bottomBar really the way to go? -> NOOOOO -> Plus Button like in Things ;)
             HStack {
                 createSessionButton
                 stopSessionButton
@@ -102,8 +102,12 @@ extension Home {
     
     @ViewBuilder
     private var newSessionFormSheet: some View {
-        if newSession != nil {
+        if newSession != nil { // TODO: Fix bug: on first appear doesn't appear
             NavigationStack {
+                SessionFormView( // TODO: Inject correct title -> Create / Edit -> Check whether item is in sessionStore or not
+                    session: Binding { newSession! } set: { newSession = $0 },
+                    onCreate: sessionManager.createSession // TODO: Connect
+                )
             }
         }
     }

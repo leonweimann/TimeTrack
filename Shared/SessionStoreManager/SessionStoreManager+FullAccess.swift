@@ -7,6 +7,8 @@
 
 @preconcurrency import EventKit
 
+// TODO: Save and update stored events / sessions based on intern sessions array
+
 extension SessionStoreManager {
     func setupSessionStore() async throws {
         let response = try await datastore.verifyAuthorizationStatus()
