@@ -133,6 +133,10 @@ extension Home {
         .scrollPosition(id: $selection)
         .scrollIndicators(.hidden)
         .scrollDisabled(sessionManager.currents.count < 2)
+        .scrollDisabled(true)
+        .listRowInsets(.init())
+        .contentMargins(.vertical, 12, for: .scrollContent)
+        .contentMargins(.horizontal, 20, for: .scrollContent)
         .animation(.smooth, value: selection)
     }
     
