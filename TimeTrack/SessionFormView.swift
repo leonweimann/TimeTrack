@@ -97,12 +97,9 @@ extension SessionFormView {
     }
 }
 
-#Preview {
-    @Previewable @State var issueManager = IssueManager()
-    @Previewable @State var session = Session.template()
-    
+#Preview(traits: .issueManager) {
+    @Previewable @State var session = Session.template()    
     NavigationStack {
         SessionFormView(session: $session) { _ in }
     }
-    .attachIssueManager(issueManager)
 }

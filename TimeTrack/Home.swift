@@ -214,6 +214,6 @@ extension Home {
     }
 }
 
-#Preview(traits: .sessionStore()) {
+#Preview(traits: .sessionStore(), .issueManager) {
     Home()
 }
