@@ -73,6 +73,7 @@ extension Home {
             currentSessionsHeader
         }
         
+        // TODO: Maybe introduce custom Picker which use other visualization than checkmark?
         Picker("", selection: $selection) {
             ForEach(sessionManager.currents) { current in
                 Text(current.title)
@@ -105,7 +106,7 @@ extension Home {
         if newSession != nil { // TODO: Fix bug: on first appear doesn't appear
             NavigationStack {
                 SessionFormView( // TODO: Inject correct title -> Create / Edit -> Check whether item is in sessionStore or not
-                    session: Binding { newSession! } set: { newSession = $0 },
+                    session: Binding { newSession! } set: { newSession = $0 }, // Force unwrapping newSession causes fatal error sometimes
                     onCreate: sessionManager.createSession // TODO: Connect
                 )
             }
