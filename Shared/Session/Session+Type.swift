@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SessionType: Int, Hashable, CaseIterable, Identifiable {
+enum SessionType: Int, Hashable, CaseIterable, Identifiable, Equatable {
     var id: Int { rawValue }
     
     case personal = 0
