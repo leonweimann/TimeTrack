@@ -11,7 +11,8 @@ struct Home: View {
     @Environment(SessionStoreManager.self) private var sessionManager
     @State private var selection: Session.ID?
     
-    @State private var newSession: Session?
+    @State private var presentSessionFormSheet = false
+    @State private var formSession: Session?
     
     var body: some View {
         NavigationStack {
@@ -28,12 +29,11 @@ struct Home: View {
                 }
             }
             .navigationTitle("TimeTrack")
-            .sheet(item: $newSession, onDismiss: cancelSessionCreation) { _ in
-                newSessionFormSheet
+            .sheet(isPresented: $presentSessionFormSheet, onDismiss: onSessionFormSheetDismiss) {
+                sessionFormSheetView
             }
-            .onAppear {
-                selection = sessionManager.currents.first?.id
-            }
+            .onChange(of: formSession != nil) { presentSessionFormSheet = $1 } // TODO: Maintain to extra func
+            .onAppear { selection = sessionManager.currents.first?.id } // TODO: Maintain to extra func
         }
     }
 }
@@ -101,13 +101,15 @@ extension Home {
         }
     }
     
-    @ViewBuilder
-    private var newSessionFormSheet: some View {
-        if newSession != nil { // TODO: Fix bug: on first appear doesn't appear
-            NavigationStack {
-                SessionFormView( // TODO: Inject correct title -> Create / Edit -> Check whether item is in sessionStore or not
-                    session: Binding { newSession! } set: { newSession = $0 }, // Force unwrapping newSession causes fatal error sometimes
-                    onCreate: sessionManager.createSession // TODO: Connect
+    private var sessionFormSheetView: some View {
+        NavigationStack {
+            if let id = formSession?.id {
+                let isNew = !sessionManager.sessionExists(id)
+                
+                SessionFormView(
+                    isNew ? "Create new Session" : "Edit a session",
+                    session: Binding { formSession ?? .template() } set: { formSession = $0 },
+                    onCreate: isNew ? sessionManager.createSession : sessionManager.updateSession
                 )
             }
         }
@@ -125,8 +127,10 @@ extension Home {
         }
     }
     
-    private var editSessionButton: some View {
-        Button(action: editSession) {
+    private func editSessionButton(_ session: Session) -> some View {
+        Button {
+            editSession(session)
+        } label: {
             Label("Edit Session", systemImage: "pencil")
         }
     }
@@ -160,7 +164,7 @@ extension Home {
             
             Divider()
             
-            editSessionButton
+            editSessionButton(session)
         } label: {
             SessionDetailView(session: session)
         } 
@@ -198,11 +202,7 @@ extension Home {
 
 extension Home {
     private func createSession() {
-        newSession = .template()
-    }
-    
-    private func cancelSessionCreation() {
-        newSession = nil
+        formSession = .template()
     }
     
     private func stopSession() {
@@ -210,8 +210,12 @@ extension Home {
         try? sessionManager.finishSession(selection) // TODO: error handling
     }
     
-    private func editSession() { // TODO: ...
-
+    private func editSession(_ session: Session) {
+        formSession = session
+    }
+    
+    private func onSessionFormSheetDismiss() {
+        formSession = nil
     }
 }
 
