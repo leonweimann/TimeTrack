@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct Home: View {
+    @Environment(IssueManager.self) private var issueManager
+    
     @Environment(SessionStoreManager.self) private var sessionManager
     @State private var selection: Session.ID?
     
@@ -207,7 +209,9 @@ extension Home {
     
     private func stopSession() {
         guard let selection else { return }
-        try? sessionManager.finishSession(selection) // TODO: error handling
+        issueManager.withError {
+            try sessionManager.finishSession(selection)
+        }
     }
     
     private func editSession(_ session: Session) {
