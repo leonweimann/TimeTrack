@@ -25,6 +25,10 @@ extension SessionStoreManager {
         return index
     }
     
+    func sessionExists(_ sessionID: Session.ID) -> Bool {
+        return (try? index(for: sessionID)) != nil
+    }
+    
     func getBinding(to sessionWithID: Session.ID) throws -> Binding<Session> {
         let index = try index(for: sessionWithID)
         return Binding {
