@@ -23,18 +23,18 @@ struct Home: View {
                     noSessionsView
                 } else {
                     List {
-                        currentSessions
+                        currentsSession
+                            .listSectionSpacing(.compact)
                         
-                        // TODO: Recents on next nav page. Maybe there a nice list with favs, presets etc.?
-                        recentSessions
+                        favoritesSection
+                        
+                        recentsSession
                     }
                     .toolbar { toolbar }
                 }
             }
             .navigationTitle("TimeTrack")
-            .sheet(isPresented: $presentSessionFormSheet, onDismiss: onSessionFormSheetDismiss) {
-                sessionFormSheetView
-            }
+            .sheet(isPresented: $presentSessionFormSheet, onDismiss: onSessionFormSheetDismiss) { sessionFormSheetView }
             .onChange(of: formSession != nil) { presentSessionFormSheet = $1 } // TODO: Maintain to extra func
             .onAppear { selection = sessionManager.currents.first?.id } // TODO: Maintain to extra func
         }
@@ -46,16 +46,9 @@ struct Home: View {
 extension Home {
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
-        ToolbarItem(placement: .bottomBar) {
+        ToolbarItem(placement: .bottomBar) { // TODO: Maybe something like in Things is nicer?
             createSessionButton
         }
-        
-//        ToolbarItem(placement: .bottomBar) { // TODO: Is bottomBar really the way to go? -> NOOOOO -> Plus Button like in Things ;)
-//            HStack {
-//                createSessionButton
-//                stopSessionButton
-//            }
-//        }
     }
     
     private var noSessionsView: some View {
@@ -69,42 +62,98 @@ extension Home {
     }
     
     @ViewBuilder
-    private var currentSessions: some View {
-        Section {
-            if sessionManager.currents.isEmpty {
-                createSessionButton
-            } else {
+    private var currentsSession: some View {
+        if sessionManager.currents.isEmpty {
+            createSessionButton
+        } else {
+            Section {
                 currentsComponent
+            } header: {
+                currentsHeader
             }
-        } header: {
-            currentSessionsHeader
+            
+            currentDetailSelector
         }
-        
-        // TODO: Maybe introduce custom Picker which use other visualization than checkmark?
-        Picker("", selection: $selection) {
+    }
+    
+    private var currentsHeader: some View {
+        HStack {
+            Text("Current Sessions")
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            createSessionButton
+                .labelStyle(.iconOnly)
+                .font(.callout)
+                .fontWeight(.semibold)
+        }
+    }
+    
+    private var currentDetailSelector: some View {
+        Picker(selection: $selection) {
             ForEach(sessionManager.currents) { current in
                 Text(current.title)
                     .tag(current.id)
             }
+        } label: {
+            Label("Show more", systemImage: "text.line.last.and.arrowtriangle.forward")
+                .fontWeight(.semibold)
         }
-        .pickerStyle(.inline)
-        .labelsHidden()
+        .pickerStyle(.navigationLink)
+        .font(.callout)
+        .lineLimit(1)
     }
     
-    private var recentSessions: some View {
-        Section {
-            // FILTER ...
-            ForEach(sessionManager.sessions) { session in // TODO: Remove currents...
-                // Functions: --stop--, restore, delete, --edit--, save as template
-                Button {
-                    
-                } label: {
-                    Text(session.title)
-                }
-                .tint(.primary)
+    // TODO: ..
+    @ViewBuilder
+    private var favoritesSection: some View {
+        if true {
+            Section("Favorites") {
+                ContentUnavailableView("No favorites yet.", systemImage: "star.slash.fill")
             }
-        } header: {
-            recentsHeader
+        }
+    }
+    
+    @ViewBuilder
+    private var recentsSession: some View {
+        if !sessionManager.sessions.isEmpty {
+            Section {
+                
+                // TODO: Recents on next nav page. Maybe there a nice list with favs, presets etc.?
+                // What's missing?
+                NavigationLink {
+                    // TODO: Custom View...
+                    recentsDestinationTemp
+                } label: {
+                    Label("Recent sessions", systemImage: "clock")
+                }
+            } header: {
+                recentsHeader
+            }
+        }
+    }
+    
+    private var recentsHeader: some View {
+        HStack {
+            Text("Recent Sessions")
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Text(sessionManager.recents.count, format: .number)
+                .contentTransition(.numericText())
+                .animation(.smooth, value: sessionManager.recents.count)
+        }
+    }
+    
+    private var recentsDestinationTemp: some View {
+        // TODO: Sort into sections by time / maybe also date (currently recents only involve last 24h in calendar..)
+        List(sessionManager.recents) { recent in
+            // Functions: --stop--, restore, delete (template), --edit--, save as template, create (from template..)
+            // Instead templates -> favs?
+            Button {
+                
+            } label: {
+                Text(recent.title)
+            }
+            .tint(.primary)
         }
     }
     
@@ -121,28 +170,12 @@ extension Home {
             }
         }
     }
-    
-    private var createSessionButton: some View {
-        Button(action: createSession) {
-            Label("Start a new Session", systemImage: "plus")
-        }
-    }
-    
-    private var stopSessionButton: some View {
-        Button(role: .destructive, action: stopSession) {
-            Label("Stop Session", systemImage: "stop")
-        }
-    }
-    
-    private func editSessionButton(_ session: Session) -> some View {
-        Button {
-            editSession(session)
-        } label: {
-            Label("Edit Session", systemImage: "pencil")
-        }
-    }
-    
-    private var currentsComponent: some View {
+}
+
+// MARK: -
+
+extension Home {
+    private var currentsComponent: some View { // TODO: Currently no animation / scroll even visible, so this all is unbelievable unnecessary.
         ScrollView(.horizontal) {
             LazyHStack(spacing: 0) {
                 ForEach(sessionManager.currents) { current in
@@ -174,33 +207,32 @@ extension Home {
             editSessionButton(session)
         } label: {
             SessionDetailView(session: session)
-        } 
+        }
         .foregroundStyle(Color.primary)
         .containerRelativeFrame(.horizontal)
     }
-    
-    private var currentSessionsHeader: some View {
-        HStack {
-            Text("Current Sessions (\(sessionManager.currents.count))")
-            
-            Spacer()
-            
-            createSessionButton
-                .labelStyle(.iconOnly)
-                .font(.callout)
-                .fontWeight(.semibold)
+}
+
+// MARK: -
+
+extension Home {
+    private var createSessionButton: some View {
+        Button(action: createSession) {
+            Label("Start a new Session", systemImage: "plus")
         }
     }
     
-    private var recentsHeader: some View {
-        HStack {
-            Text("Recent Sessions")
-            
-            Spacer()
-            
-            Text(sessionManager.sessions.count, format: .number)
-                .contentTransition(.numericText())
-                .animation(.smooth, value: sessionManager.sessions.count)
+    private var stopSessionButton: some View {
+        Button(role: .destructive, action: stopSession) {
+            Label("Stop Session", systemImage: "stop")
+        }
+    }
+    
+    private func editSessionButton(_ session: Session) -> some View {
+        Button {
+            editSession(session)
+        } label: {
+            Label("Edit Session", systemImage: "pencil")
         }
     }
 }
