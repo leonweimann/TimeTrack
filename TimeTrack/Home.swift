@@ -25,6 +25,7 @@ struct Home: View {
                     List {
                         currentSessions
                         
+                        // TODO: Recents on next nav page. Maybe there a nice list with favs, presets etc.?
                         recentSessions
                     }
                     .toolbar { toolbar }
@@ -45,12 +46,16 @@ struct Home: View {
 extension Home {
     @ToolbarContentBuilder
     private var toolbar: some ToolbarContent {
-        ToolbarItem(placement: .bottomBar) { // TODO: Is bottomBar really the way to go? -> NOOOOO -> Plus Button like in Things ;)
-            HStack {
-                createSessionButton
-                stopSessionButton
-            }
+        ToolbarItem(placement: .bottomBar) {
+            createSessionButton
         }
+        
+//        ToolbarItem(placement: .bottomBar) { // TODO: Is bottomBar really the way to go? -> NOOOOO -> Plus Button like in Things ;)
+//            HStack {
+//                createSessionButton
+//                stopSessionButton
+//            }
+//        }
     }
     
     private var noSessionsView: some View {
