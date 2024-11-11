@@ -89,7 +89,7 @@ extension Home {
     private var recentSessions: some View {
         Section {
             // FILTER ...
-            ForEach(sessionManager.sessions) { session in
+            ForEach(sessionManager.sessions) { session in // TODO: Remove currents...
                 // Functions: --stop--, restore, delete, --edit--, save as template
                 Button {
                     
