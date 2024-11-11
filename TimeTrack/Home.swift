@@ -30,6 +30,8 @@ struct Home: View {
                         
                         recentsSession
                     }
+                    .disabled(presentSessionFormSheet)
+                    .animation(.default, value: presentSessionFormSheet)
                     .toolbar { toolbar }
                 }
             }
@@ -73,6 +75,7 @@ extension Home {
             }
             
             currentDetailSelector
+                .disabled(sessionManager.currents.count < 2)
         }
     }
     
@@ -104,32 +107,27 @@ extension Home {
     }
     
     // TODO: ..
-    @ViewBuilder
     private var favoritesSection: some View {
-        if true {
-            Section("Favorites") {
-                ContentUnavailableView("No favorites yet.", systemImage: "star.slash.fill")
-            }
+        Section("Favorites") {
+            ContentUnavailableView("No favorites yet.", systemImage: "star.slash.fill")
         }
     }
     
-    @ViewBuilder
     private var recentsSession: some View {
-        if !sessionManager.sessions.isEmpty {
-            Section {
-                
-                // TODO: Recents on next nav page. Maybe there a nice list with favs, presets etc.?
-                // What's missing?
-                NavigationLink {
-                    // TODO: Custom View...
-                    recentsDestinationTemp
-                } label: {
-                    Label("Recent sessions", systemImage: "clock")
-                }
-            } header: {
-                recentsHeader
+        Section {
+            
+            // TODO: Recents on next nav page. Maybe there a nice list with favs, presets etc.?
+            // What's missing?
+            NavigationLink {
+                // TODO: Custom View...
+                recentsDestinationTemp
+            } label: {
+                Label("Recent sessions", systemImage: "clock")
             }
+        } header: {
+            recentsHeader
         }
+        .disabled(sessionManager.recents.count < 1)
     }
     
     private var recentsHeader: some View {
@@ -169,13 +167,14 @@ extension Home {
                 )
             }
         }
+        .presentationDetents([.medium, .large])
     }
 }
 
 // MARK: -
 
 extension Home {
-    private var currentsComponent: some View { // TODO: Currently no animation / scroll even visible, so this all is unbelievable unnecessary.
+    private var currentsComponent: some View { // TODO: Currently no animation / scroll even visible, so this all is unbelievable unnecessary. | Animation is visible when half sheet makes changes! -> so maybe also on iPad / Mac?.
         ScrollView(.horizontal) {
             LazyHStack(spacing: 0) {
                 ForEach(sessionManager.currents) { current in
@@ -260,6 +259,6 @@ extension Home {
     }
 }
 
-#Preview(traits: .sessionStore(), .issueManager) {
+#Preview(traits: .sessionStore(isEmpty: false), .issueManager) {
     Home()
 }
