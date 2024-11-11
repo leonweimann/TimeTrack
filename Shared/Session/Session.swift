@@ -14,7 +14,7 @@ struct Session: Hashable, Identifiable {
     var name: String
     
     var startDate: Date
-    var endDate: Date?
+    private(set) var endDate: Date?
     
     var isCurrent: Bool { endDate == nil }
     
@@ -33,13 +33,33 @@ extension Session {
     }
 }
 
+extension Session {
+    mutating func endNow() throws {
+        guard endDate == nil else { throw SessionError.alreadyFinished }
+        self.endDate = .now
+    }
+}
+
+// SWIFTUI @STATE DOESNT RECOGNIZE ANY CHANGES TO PROPERTIES, IF THEY ARENT CONSIDERED HERE
 extension Session: Equatable {
     static func ==(lhs: Session, rhs: Session) -> Bool {
-        lhs.id == rhs.id
+        lhs.id == rhs.id &&
+        lhs.type == rhs.type &&
+        lhs.name == rhs.name &&
+        lhs.startDate == rhs.startDate &&
+        lhs.endDate == rhs.endDate
+    }
+    
+    func isIdentical(to other: Session) -> Bool {
+        id == other.id
     }
 }
 
 extension Session {
+    static func template() -> Session {
+        Session(type: .personal, name: "", startDate: Date.now)
+    }
+    
     static var sessionStartMock: Session {
         Session(type: .personal, name: "Ironing", startDate: Date.now)
     }

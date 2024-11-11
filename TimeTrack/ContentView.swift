@@ -8,14 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var issueManager = IssueManager()
+    @State private var sessionManager = SessionStoreManager()
+
+    // setupSessionStore, app splash screen, app welcome, etc.?
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        Home()
+            .environment(sessionManager)
+            .attachIssueManager(issueManager)
+            .task {
+                await issueManager.withError {
+                    try await sessionManager.setupSessionStore()
+                }
+            }
     }
 }
 

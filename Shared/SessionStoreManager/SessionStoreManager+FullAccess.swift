@@ -7,6 +7,8 @@
 
 @preconcurrency import EventKit
 
+// TODO: Save and update stored events / sessions based on intern sessions array
+
 extension SessionStoreManager {
     func setupSessionStore() async throws {
         let response = try await datastore.verifyAuthorizationStatus()
@@ -21,7 +23,7 @@ extension SessionStoreManager {
                 do {
                     return try Session(event: event)
                 } catch {
-                    if case SessionError.creationFailure(let failure) = error {
+                    if case SessionError.creationFailure(_) = error {
                         throw error
                     }
                     
@@ -33,11 +35,12 @@ extension SessionStoreManager {
     }
     
     func addSession(_ session: Session) async throws {
+        guard !session.isCurrent else { throw SessionError.notFinished }
         try await datastore.addEvent(session.event(store: datastore.eventStore))
-        sessions.append(session)
     }
     
     func removeSession(_ session: Session) async throws {
         try await datastore.removeEvent(session.event(store: datastore.eventStore))
+        sessions.removeAll { session.isIdentical(to: $0) }
     }
 }
