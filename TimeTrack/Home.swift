@@ -37,8 +37,8 @@ struct Home: View {
             }
             .navigationTitle("TimeTrack")
             .sheet(isPresented: $presentSessionFormSheet, onDismiss: onSessionFormSheetDismiss) { sessionFormSheetView }
-            .onChange(of: formSession != nil) { presentSessionFormSheet = $1 } // TODO: Maintain to extra func
-            .onAppear { selection = sessionManager.currents.first?.id } // TODO: Maintain to extra func
+            .onChange(of: formSession != nil, onFormSessionClear)
+            .onAppear(perform: setupSelection)
         }
     }
 }
@@ -141,6 +141,7 @@ extension Home {
         }
     }
     
+    // TODO: This is temporary !
     private var recentsDestinationTemp: some View {
         // TODO: Sort into sections by time / maybe also date (currently recents only involve last 24h in calendar..)
         List(sessionManager.recents) { recent in
@@ -256,6 +257,14 @@ extension Home {
     
     private func onSessionFormSheetDismiss() {
         formSession = nil
+    }
+    
+    private func onFormSessionClear(oldValue: Bool, newValue: Bool) {
+        presentSessionFormSheet = newValue
+    }
+    
+    private func setupSelection() {
+        selection = sessionManager.currents.first?.id
     }
 }
 
